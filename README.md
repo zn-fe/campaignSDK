@@ -4,8 +4,11 @@
 
 #### 安装：
 
-```bower install ```
+```bower install campaignSDK```
 
 #### 使用
 1. 在项目中引入此 campaignSDK.js
-2. 
+2. ...
+3. ...
+
+// TODO
