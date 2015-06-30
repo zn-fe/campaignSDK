@@ -2,10 +2,10 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-06-18 11:03:41
+* @Last Modified time: 2015-07-01 01:19:33
 */
 
-/*global $, jQuery, ga, _gaq*/
+/*global $, jQuery, ga, _gaq, wx */
 
 /* jshint ignore:start */
 ;
@@ -14,50 +14,6 @@
 (function (window, undefined) {
 
     var campaignTools = {};
-
-    campaignTools.constant = {
-        // 用于电话号码验证，已加入阿里巴巴运营的 170 号段，最后更新于 2014.7
-        telReg: /^0?(13[0-9]|15[0-9]|18[0-9]|14[57]|17[0])[0-9]{8}$/
-    };
-
-    /*
-     * GA 事件统计
-     */
-    campaignTools.pushGaEvent = function (category, action, label, value) {
-
-        category = category || '';
-        action = action || '';
-        label = label || '';
-        value = parseInt(value, 10) || 0;
-
-        if (typeof ga !== 'undefined' && ga) {
-            ga('send', 'event', category, action, label, value);
-        } else if (typeof _gaq !== 'undefined' && _gaq) {
-            _gaq.push(['_trackEvent', category, action, label, value]);
-        }
-    };
-
-    /*
-     * body 高设置为屏幕显示区域高度
-     * @notice Webview 有时屏幕初始高度会有 bug，此方法为解决此 bug
-     */
-    campaignTools.setFullScreenHeight = function (minHeight) {
-
-        var height = window.innerHeight;
-        minHeight = minHeight || 480; // 根据页面需求变化，默认 480px
-
-        if (height < minHeight) {
-            setTimeout(function () {
-                height = window.innerHeight;
-                if (height < minHeight) {
-                    height = minHeight;
-                }
-                document.body.style.height = height + 'px';
-            }, 1000);
-        } else {
-            document.body.style.height = height + 'px';
-        }
-    };
 
     /*
      * 判断设备
@@ -123,11 +79,11 @@
         var campaignPlugin = window.campaignPlugin;
 
 
-/*
-===========================================================================
-    分享相关
-===========================================================================
-*/
+        /*
+        ===========================================================================
+            分享相关
+        ===========================================================================
+        */
 
         /*
          * 调起安卓系统级别分享
@@ -189,11 +145,11 @@
 
 
 
-/*
-===========================================================================
-    用户相关
-===========================================================================
-*/
+        /*
+        ===========================================================================
+            用户相关
+        ===========================================================================
+        */
         /*
          * 获取手机 UDID
          * @return {string} UDID
@@ -270,12 +226,12 @@
         };
 
 
-/*
-===========================================================================
-    应用相关
-===========================================================================
-*/
-    /*======== 判断 ========*/
+        /*
+        ===========================================================================
+            应用相关
+        ===========================================================================
+        */
+        /*======== 判断 ========*/
 
         /*
          * 获取应用安装状态
@@ -297,7 +253,7 @@
 
 
 
-    /*======== 获取 ========*/
+        /*======== 获取 ========*/
 
         /*
          * 获取应用状态
@@ -309,8 +265,8 @@
          *         3 -- Uninstalling 正在卸载
          *         4 -- Patching 
          */
-        campaignTools.getAppVersionCode = function (packageName) {
-            return campaignPlugin.getAppVersionCode(packageName);
+        campaignTools.getAppState = function (packageName) {
+            return campaignPlugin.getAppState(packageName);
         };
 
         /*
@@ -334,7 +290,7 @@
         };
 
 
-    /*======== 打开 ========*/
+        /*======== 打开 ========*/
 
         /*
          * 打开其他应用
@@ -386,6 +342,26 @@
             campaignPlugin.startActivity('wdj://detail/subscribe/publisher/' + type + '/' + id);
         };
 
+        // 打开某个订阅源账号的 P4 profile 页面
+        campaignTools.openSubscribePublisher = function (uid) {
+            if (typeof campaignPlugin.openSubscribePublisher !== 'undefined') {
+                campaignPlugin.openSubscribePublisher(uid);
+            } else {
+                var url = 'intent://subscribe.wandoujia.com/publisher/ACCOUNT/' + uid + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
+                window.campaignPlugin.startActivity(url);
+            }
+        };
+
+        // 打开某个订阅列表
+        campaignTools.openSubscribeSubset = function (id) {
+            if (typeof campaignPlugin.openSubscribeSubset !== 'undefined') {
+                window.campaignPlugin.openSubscribeSubset(id);
+            } else {
+                var url = 'intent://subscribe.wandoujia.com/list/' + id + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
+                window.campaignPlugin.startActivity(url);
+            }
+        };
+
         /*
          * 调起 P4 登录界面
          */
@@ -405,7 +381,7 @@
         };
 
 
-    /*======== 安装 ========*/
+        /*======== 安装 ========*/
 
         /*
          * !ABANDON! *
@@ -467,11 +443,11 @@
 
 
 
-/*
-===========================================================================
-    P4 & 系统
-===========================================================================
-*/
+        /*
+        ===========================================================================
+            P4 & 系统
+        ===========================================================================
+        */
         
         /*
          * 刷新当前 WebView
@@ -632,6 +608,434 @@
         };
 
     }
+
+    /*
+     * 一些常用的方法及对象
+     *
+     *
+     */
+    campaignTools.constant = {
+        // 用于电话号码验证，已加入阿里巴巴运营的 170 号段，最后更新于 2014.7
+        telReg: /^0?(13[0-9]|15[0-9]|18[0-9]|14[57]|17[0])[0-9]{8}$/
+    };
+
+     // 常用 API 地址
+     campaignTools.api = {
+        needle: 'http://www.wandoujia.com/needle/source/',
+        apps: 'http://www.wandoujia.com/api/apps/apps',
+        appsOptFields: '?opt_fields=title,icons.*,apks.*.size,apks.*.bytes,apks.*.downloadUrl.*.url,apks.*.creation,installedCountStr,apks.*.versionName,apks.*.versionCode',
+        itemlist: 'http://www.wandoujia.com/api/subscribe/itemlist/',
+        subscribe: 'http://www.wandoujia.com/api/subscribe/subscriber/subscribe',
+        unsubscribe: 'http://www.wandoujia.com/api/subscribe/subscriber/unsubscribe',
+        subscribeStatus: 'http://www.wandoujia.com/api/subscribe/publisher/ACCOUNT/'
+    };
+
+    /*
+    ===========================================================================
+        订阅相关
+    ===========================================================================
+    */
+
+    // 获取某订阅列表的简介、对应的订阅源账号信息
+    campaignTools.getFeedListData = function (id, callback) {
+        $.ajax({
+            url: campaignTools.api.itemlist + id + '/summary',
+            dataType: 'json',
+            success: function (resp) {
+                if (callback && typeof callback === 'function') {
+                    callback(resp);
+                }
+            }
+        });
+    };
+
+    // 获取某订阅列表中的所有条目
+    campaignTools.getFeedItemsData = function (id, callback) {
+        $.ajax({
+            url: campaignTools.api.itemlist + id + '/item',
+            dataType: 'json',
+            success: function (resp) {
+                if (callback && typeof callback === 'function') {
+                    callback(resp);
+                }
+            }
+        });
+    };
+
+    // 获取当前用户与某订阅源账号的关系（是否已关注）
+    campaignTools.getSubscribeStatus = function (uid, callback) {
+        $.ajax({
+            url :  campaignTools.api.subscribeStatus + uid,
+            dataType : 'json',
+            success: function (resp) {
+                if (callback && typeof callback === 'function') {
+                    callback(resp);
+                }
+            }
+        });
+    };
+
+
+    // 订阅某「订阅源账号」
+    // 需要用户已登录
+    campaignTools.subscribe = function (uid, callback) {
+        $.ajax({
+            url: campaignTools.api.subscribe,
+            dataType: 'json',
+            contentType: 'application/json; charset=UTF-8',
+            type: 'POST',
+            data: JSON.stringify([{'type': 'ACCOUNT', 'id': uid}]),
+            success: function (resp) {
+                if (callback && typeof callback === 'function') {
+                    callback(resp);
+                }
+            }
+        });
+    };
+
+    // 取消订阅某「订阅源账号」
+    // 需要附带登录信息 wdj_auth
+    campaignTools.unsubscribe = function (uid, callback) {
+        var req = new XMLHttpRequest();
+        req.open('POST', campaignTools.api.unsubscribe, false);
+        req.send(JSON.stringify([{'type': 'ACCOUNT', 'id': uid, 'wdj_auth': $.cookie('wdj_auth')}]));
+        var headers = req.getAllResponseHeaders().toLowerCase();
+
+        // 后端以 200 作为取消关注成功的标志
+        if (req.status === 200) {
+            if (callback && typeof callback === 'function') {
+                callback();
+            }
+        }
+    };
+
+    /*
+    ===========================================================================
+        其他
+    ===========================================================================
+    */
+
+    /*
+     * GA 事件统计
+     */
+    campaignTools.pushGaEvent = function (category, action, label, value) {
+
+        category = category || '';
+        action = action || '';
+        label = label || '';
+        value = parseInt(value, 10) || 0;
+
+        if (typeof ga !== 'undefined' && ga) {
+            ga('send', 'event', category, action, label, value);
+        } else if (typeof _gaq !== 'undefined' && _gaq) {
+            _gaq.push(['_trackEvent', category, action, label, value]);
+        }
+    };
+
+    /*
+     * body 高设置为屏幕显示区域高度
+     * @notice Webview 有时屏幕初始高度会有 bug，此方法为解决此 bug
+     */
+    campaignTools.setFullScreenHeight = function (minHeight) {
+
+        var height = window.innerHeight;
+        minHeight = minHeight || 480; // 根据页面需求变化，默认 480px
+
+        if (height < minHeight) {
+            setTimeout(function () {
+                height = window.innerHeight;
+                if (height < minHeight) {
+                    height = minHeight;
+                }
+                document.body.style.height = height + 'px';
+            }, 1000);
+        } else {
+            document.body.style.height = height + 'px';
+        }
+    };
+
+    // 取 URL 中的参数
+    // http://www.xxxx.com/xxx/xxx?id=1
+    // campaignTools.parseQueryString().id;
+    campaignTools.parseQueryString = function () {
+        var str = window.location.search;
+        var objURL = {};
+        str.replace(
+            new RegExp('([^?=&]+)(=([^&]*))?', 'g'),
+            function ($0, $1, $2, $3) {
+                objURL[$1] = $3;
+            }
+        );
+        return objURL;
+    };
+
+
+    /*
+    ===========================================================================
+        分享相关
+    ===========================================================================
+    */
+
+    /*
+     * 微信 sdk 分享
+     * @param shareTimelineObject {object}
+     * @param shareFriendObject {object}
+     *  shareTimelineObject = {
+            title: '',
+            link: '',
+            imgUrl: '',
+            successCallback: function () {
+                alert('分享成功');
+            }
+        }
+     *  shareFriendObject = {
+            title: '',
+            desc: '',
+            link: '',
+            imgUrl: '',
+            successCallback: function () {
+                alert('分享成功');
+            }
+        }
+     * 
+     */
+    campaignTools.wechatWebviewShareSetup = function (shareTimelineObject, shareFriendObject) {
+        $.ajax({
+            url: 'http://who.wandoujia.com/wx-corp/js-sdk',
+            type: 'POST',
+            data: {
+                url: location.href.split('#')[0]
+            }
+        }).done(function (r) {
+            // 开始配置微信JS-SDK
+            wx.config({
+                debug: false,
+                appId: r.appId,
+                timestamp: r.timestamp,
+                nonceStr: r.nonceStr,
+                signature: r.signature,
+                jsApiList: [
+                    'checkJsApi',
+                    'onMenuShareTimeline',
+                    'onMenuShareAppMessage',
+                    'onMenuShareQQ',
+                    'onMenuShareWeibo',
+                    'hideMenuItems'
+                ]
+            });
+
+            wx.ready(function () {
+                wx.onMenuShareTimeline({
+                    title: shareTimelineObject.title, // 分享标题
+                    link: shareTimelineObject.link, // 分享链接
+                    imgUrl: shareTimelineObject.imgUrl, // 分享图标
+                    success: function () {
+                        // 用户确认分享后执行的回调函数
+                        if (shareTimelineObject.successCallback && typeof shareTimelineObject.successCallback === 'function') {
+                            shareTimelineObject.successCallback();
+                        }
+                    },
+                    cancel: function () {
+                        // 用户取消分享后执行的回调函数
+                    }
+                });
+
+                wx.onMenuShareAppMessage({
+                    title: shareFriendObject.title, // 分享标题
+                    desc: shareFriendObject.desc, // 分享描述
+                    link: shareFriendObject.link, // 分享链接
+                    imgUrl: shareFriendObject.imgUrl, // 分享图标
+                    type: '', // 分享类型,music、video或link，不填默认为link
+                    dataUrl: '', // 如果type是music或video，则要提供数据链接，默认为空
+                    success: function () {
+                        // 用户确认分享后执行的回调函数
+                        if (shareFriendObject.successCallback && typeof shareFriendObject.successCallback === 'function') {
+                            shareFriendObject.successCallback();
+                        }
+                    },
+                    cancel: function () {
+                        // 用户取消分享后执行的回调函数
+                    }
+                });
+            });
+        });
+    };
+
+    // 常用分享按钮
+    // 微博 & 微信好友 & 微信朋友圈
+    
+    /* eg.
+    // 设置各按钮的分享：
+
+    var weibo = {
+        element: '.share-weibo',
+        desc: '',
+        link: '',
+        shortLink: '', // 选填
+        imgUrl: '',
+        successCallback: function (resp) {
+            switch (resp) {
+                case 'P4-weibo-launch':
+                    console.log('P4 内，调起微博 app 的分享界面进行分享');
+                    break;
+                case 'P4-weibo-redirect':
+                    console.log('P4 内，跳转到微博分享页进行分享');
+                    break;
+                case 'other-weibo-redirect':
+                    console.log('P4 外，跳转到微博分享页进行分享');
+                    break;
+            }
+        }
+    };
+
+    var wechatFriend = {
+        element: '.share-wechat-friend',
+        title: '',
+        desc: '',
+        link: '',
+        imgUrl: '',
+        tips: function () {
+            // 可以自定义弹出提示的方法
+            var tipsImg = 'http://t.wdjcdn.com/upload/mkt-campaign/designaward/208/wechat-share-tips.png';
+            $('body').append('<div class="overlay"></div><div class="popup wechat-image"><img width="103" id="wechat-share-tips-img" src="' + tipsImg + '" /></div>');
+        },
+        qrcode: function () {
+            // 可以自定义弹出二维码的方法
+            var popup = {
+                title: '分享到微信',
+                content: '<div class="center"><img class="qrcode" width="150" src="http://www.wandoujia.com/qr?s=5&c=' + encodeURIComponent(wechatFriend.link) + '" /></div><p>用微信扫描二维码，就可以分享到好友或朋友圈了</p>',
+                button: '关 闭'
+            };
+            window.renderPopoup(popup);
+        },
+        successCallback: function (resp) {
+            switch (resp) {
+                case 'P4-wechatFriend-launch':
+                    console.log('P4 内，调起微信 app 的分享给好友界面进行分享');
+                    break;
+                case 'wechat-wechatFriend-tips':
+                    console.log('微信 webview 内，提示点击右上角下拉菜单，手动分享');
+                    break;
+                case 'other-wechatFriend-qrcode':
+                    console.log('其他情况，弹出二维码');
+                    break;
+            }
+        }
+    };
+
+    var wechatTimeline = {
+        element: '.share-wechat-timeline',
+        title: '',
+        link: '',
+        imgUrl: '',
+        tips: function () {
+            // 可以自定义弹出提示的方法
+            var tipsImg = 'http://t.wdjcdn.com/upload/mkt-campaign/designaward/208/wechat-share-tips.png';
+            $('body').append('<div class="overlay"></div><div class="popup wechat-image"><img width="103" id="wechat-share-tips-img" src="' + tipsImg + '" /></div>');
+        },
+        qrcode: function () {
+            // 可以自定义弹出二维码的方法
+            var popup = {
+                title: '分享到微信',
+                content: '<div class="center"><img class="qrcode" width="150" src="http://www.wandoujia.com/qr?s=5&c=' + encodeURIComponent(wechatTimeline.link) + '" /></div><p>用微信扫描二维码，就可以分享到好友或朋友圈了</p>',
+                button: '关 闭'
+            };
+            window.renderPopoup(popup);
+        },
+        successCallback: function (resp) {
+            switch (resp) {
+                case 'P4-wechatTimeline-launch':
+                    console.log('P4 内，调起微信 app 的分享到朋友圈界面进行分享');
+                    break;
+                case 'wechat-wechatTimeline-tips':
+                    console.log('微信 webview 内，提示点击右上角下拉菜单，手动分享');
+                    break;
+                case 'other-wechatTimeline-qrcode':
+                    console.log('其他情况，弹出二维码');
+                    break;
+            }
+        }
+    };
+    */
+
+    campaignTools.shareButtonSetup = function (weibo, wechatFriend, wechatTimeline) {
+        var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(weibo.shortLink || weibo.link) + '&title=' + encodeURIComponent(weibo.desc) + '&pic=' + weibo.imgUrl;
+
+        if (campaignTools.UA.inWdj) {
+            var localVersion = null;
+            if (campaignTools.isInstalled('com.sina.weibo')) {
+                localVersion = campaignTools.getAppVersionName('com.sina.weibo').replace(/\./g, '');
+            }
+
+            $(weibo.element).click(function () {
+                if (localVersion && parseInt(localVersion) < 528) {
+                    weibo.successCallback('P4-weibo-launch');
+                    campaignTools.toast('正在打开微博，请稍候...');
+                    campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
+                } else {
+                    weibo.successCallback('P4-weibo-redirect');
+                    window.location.href = weiboURL;
+                }
+            });
+
+            $(wechatFriend.element).click(function () {
+                wechatFriend.successCallback('P4-wechatFriend-launch');
+
+                campaignTools.toast('正在打开微信，请稍候...');
+                campaignTools.runAppShare(wechatFriend.title, wechatFriend.desc, wechatFriend.imgUrl, wechatFriend.link, 'WECHAT');
+            });
+
+            $(wechatTimeline.element).click(function () {
+                wechatTimeline.successCallback('P4-wechatTimeline-launch');
+
+                campaignTools.toast('正在打开微信，请稍候...');
+                campaignTools.runAppShare(wechatTimeline.title, wechatTimeline.title, wechatTimeline.imgUrl, wechatTimeline.link, 'WECHAT_TIMELINE');
+            });
+
+        } else {
+
+            // 分享到微博
+            // 跳转页面
+            $(weibo.element).click(function () {
+                weibo.successCallback('weibo-redirect');
+                window.location.href = weiboURL;
+            });
+
+            // 分享到微信
+            $(wechatFriend.element + ', ' + wechatTimeline.element).click(function (e) {
+                // 微信内
+                // 提示点击右上角
+                if (campaignTools.UA.inWechat) {
+                    
+                    if ($(e).hasClass(wechatFriend.element)) {
+                        wechatFriend.successCallback('wechat-wechatFriend-tips');
+                        wechatFriend.tips();
+                    } else {
+                        wechatTimeline.successCallback('wechat-wechatTimeline-tips');
+                        wechatTimeline.tips();
+                    }
+
+                // 微信外
+                // 弹二维码 提示用微信扫描
+                } else {
+                    if ($(e).hasClass(wechatFriend.element)) {
+                        wechatFriend.successCallback('other-wechatFriend-tips');
+                        wechatFriend.qrcode();
+                    } else {
+                        wechatTimeline.successCallback('other-wechatTimeline-qrcode');
+                        wechatTimeline.qrcode();
+                    }
+                }
+            });
+        }
+    };
+
+    /*
+    ===========================================================================
+        todo:
+        应用安装、打开、升级
+    ===========================================================================
+    */
 
     var _campaignTools = window.campaignTools;
     window.campaignTools = campaignTools;
