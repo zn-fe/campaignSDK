@@ -185,30 +185,109 @@ if (campaignTools.UA.inWechat) {
 
 
 ##### 18. campaignTools.openApp(packageName)
+> 调起某个应用
+
+**参数说明：**
+* packageName: 应用包名，字符串。
 
 ##### 19. campaignTools.openAppDetail(packageName)
+> 打开豌豆荚里某个应用的详情页，如果该应用得过设计奖，则会打开设计奖页面。
+
+**参数说明：**
+* packageName: 应用包名，字符串。
 
 ##### 20. campaignTools.openAppDetailWithoutAward(packageName)
+>  跳过设计奖直接打开应用详情页
+
+**参数说明：**
+* packageName: 应用包名，字符串。
 
 ##### 21. campaignTools.sendIntent(serializedIntent)
+> 打开其他应用内某页面
+
+**参数说明：**
+* string: 应用内搜索协议地址，如 meituanmovie://www.meituan.com/movie?id=78379&nm=后会无期
 
 ##### 22. campaignTools.openVideoDetail(id)
+> 打开豌豆荚的某个视频详情页
+
+**参数说明：**
+* id: 视频 id
 
 ##### 23. campaignTools.openEbookDetail(id)
+> 打开豌豆荚的某个电子书详情页
+
+**参数说明：**
+* id: 电子书 id
 
 ##### 24. campaignTools.searchWords(str)
+> 使用豌豆荚搜索某个关键词
+
+**参数说明：**
+* str: 要搜索的内容
 
 ##### 25. campaignTools.openSubscribeDetail(id, type)
+> 打开豌豆荚中某个订阅源账号的页面
+
+**参数说明：**
+* id: 订阅源账号 id
+* type: 账号类型，一般为字符串 'ACCOUNT'
 
 ##### 26. campaignTools.openSubscribePublisher(uid)
+> 打开某个订阅源账号的 P4 profile 页面 (同 25)
+
+**参数说明：**
+* uid: 订阅源账号 id
 
 ##### 27. campaignTools.openSubscribeSubset(id)
+> 打开某个订阅列表
+
+
 
 ##### 28. campaignTools.loginAccount()
+> 登录豌豆荚账号: 调起 P4 登录界面
+
 
 ##### 29. campaignTools.choseLoginAccount()
+> 让用户选择以哪种方式登录豌豆荚账号
 
 ##### 30. campaignTools.installApp(app, callback)
+> 安装某个应用
+
+**参数说明：**
+* app: 一个包含了目标应用的包名、下载链接、应用名称、图标 URL、应用大小（如果不确定，可设置为空字符串）的对象。
+* callback: 安装完毕后的回调函数。可选。
+
+**返回：**
+格式：json
+
+成功: 
+
+`{'error': 0, 'message': '安装成功'}`
+
+失败：
+
+`{'error': 1, 'message': '缺少必要参数'}`
+
+
+**示例**
+```
+var app = {
+    'packageName': 'com.sina.weibo',
+    'downloadUrl': 'http://apps.wandoujia.com/redirect?signature=ba846b8&url=http%3A%2F%2Fapk.wandoujia.com%2F5%2F2c%2F7a3fefa5bd378db1723e86cba104e2c5.apk&pn=com.sina.weibo&md5=7a3fefa5bd378db1723e86cba104e2c5&apkid=14404328&vc=2022&size=37266945&pos=t/detail&appType=APP',
+    'appName': '新浪微博',
+    'iconUrl': 'http://img.wdjimg.com/mms/icon/v1/4/4b/89c84a36d3cdbfef226b42b073d9f4b4_256_256.png',
+    'size': '37266945' // 或者为空字符串 '' 
+}；
+if (campaignTools.UA.inWdj) {
+    campaignTools.installApp(app, function (resp) {
+        if (resp) {
+            console.log(resp);
+        }
+    });    
+}
+
+```
 
 ##### 31. campaignTools.reload()
 

@@ -2,7 +2,7 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-07-01 01:19:33
+* @Last Modified time: 2015-07-03 21:40:32
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -120,7 +120,7 @@
                 var localVersion = null;
 
                 if (campaignPlugin.isInstalled('com.sina.weibo')) {
-                    localVersion = window.campaignPlugin.getAppVersionName('com.sina.weibo').replace(/\./g, '');
+                    localVersion = campaignPlugin.getAppVersionName('com.sina.weibo').replace(/\./g, '');
                 }
 
                 if (localVersion && parseInt(localVersion) < 528) {
@@ -348,17 +348,17 @@
                 campaignPlugin.openSubscribePublisher(uid);
             } else {
                 var url = 'intent://subscribe.wandoujia.com/publisher/ACCOUNT/' + uid + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
-                window.campaignPlugin.startActivity(url);
+                campaignPlugin.startActivity(url);
             }
         };
 
         // 打开某个订阅列表
         campaignTools.openSubscribeSubset = function (id) {
             if (typeof campaignPlugin.openSubscribeSubset !== 'undefined') {
-                window.campaignPlugin.openSubscribeSubset(id);
+                campaignPlugin.openSubscribeSubset(id);
             } else {
                 var url = 'intent://subscribe.wandoujia.com/list/' + id + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
-                window.campaignPlugin.startActivity(url);
+                campaignPlugin.startActivity(url);
             }
         };
 
@@ -377,7 +377,7 @@
          * 让用户选择以哪种方式登录
          */
         campaignTools.choseLoginAccount = function () {
-            window.campaignPlugin.startActivity('intent://account.wandoujia.com/android/login#Intent;scheme=https;action=android.intent.action.MAIN;end');
+            campaignPlugin.startActivity('intent://account.wandoujia.com/android/login#Intent;scheme=https;action=android.intent.action.MAIN;end');
         };
 
 
@@ -407,33 +407,52 @@
                 'downloadUrl': 'http://apps.wandoujia.com/redirect?signature=ba846b8&url=http%3A%2F%2Fapk.wandoujia.com%2F5%2F2c%2F7a3fefa5bd378db1723e86cba104e2c5.apk&pn=com.sina.weibo&md5=7a3fefa5bd378db1723e86cba104e2c5&apkid=14404328&vc=2022&size=37266945&pos=t/detail&appType=APP',
                 'appName': '新浪微博',
                 'iconUrl': 'http://img.wdjimg.com/mms/icon/v1/4/4b/89c84a36d3cdbfef226b42b073d9f4b4_256_256.png',
-                'size': 37266945
+                'size': '37266945'
              }
          * @param callback {function} 如果安装完毕后需要执行回调请传入
          * @notice 不带 POS 信息，如需 POS 信息请使用废弃的老方法，把 POS 信息写进 URL 中，
                    此接口已经开始 Polish，下一版本会加上 POS 参数
          */
         campaignTools.installApp = function (app, callback) {
+            var installed = false;
+
             // 判断是否支持新版接口
             if (typeof campaignPlugin.installByPackage !== undefined) {
                 campaignPlugin.installByPackage(app.packageName);
+                responseCallback({
+                    'error': 0,
+                    'message': '安装成功'
+                });
             // 如果不支持则调用旧版接口
             } else {
-                campaignPlugin.install(app.packageName, app.downloadUrl, app.appName, app.iconUrl, app.size);
+                // 使用旧版接口时，需要判断参数的值是否完整
+                if (!app.packageName || !app.downloadUrl || !app.appName || !app.iconUrl) {
+                    if (callback && typeof callback === 'function') {
+                        callback({
+                            'error': 1,
+                            'message': '缺少必要参数'
+                        });
+                    }
+                } else {
+                    campaignPlugin.install(app.packageName, app.downloadUrl, app.appName, app.iconUrl, app.size);
+                    responseCallback({
+                        'error': 0,
+                        'message': '安装成功'
+                    });
+                }
             }
 
-
-            if (callback && typeof callback === 'function') {
-
-                var installed = false;
-                var checkInstalled = setInterval(function () {
-                    installed = campaignPlugin.isInstalled(app.packageName);
-                    if (installed) {
-                        clearInterval(checkInstalled);
-                        checkInstalled = 0;
-                        callback();
-                    }
-                }, 1500);
+            function responseCallback (object) {
+                if (callback && typeof callback === 'function') {
+                    var checkInstalled = setInterval(function () {
+                        installed = campaignPlugin.isInstalled(app.packageName);
+                        if (installed) {
+                            clearInterval(checkInstalled);
+                            checkInstalled = 0;
+                            callback(object);
+                        }
+                    }, 1500);
+                }
             }
         };
 
@@ -998,7 +1017,7 @@
             // 跳转页面
             $(weibo.element).click(function () {
                 weibo.successCallback('weibo-redirect');
-                window.location.href = weiboURL;
+                location.href = weiboURL;
             });
 
             // 分享到微信
@@ -1006,8 +1025,7 @@
                 // 微信内
                 // 提示点击右上角
                 if (campaignTools.UA.inWechat) {
-
-                    if ($(e).hasClass(wechatFriend.element)) {
+                    if ($(this).hasClass(wechatFriend.element.replace('.', ''))) {
                         wechatFriend.successCallback('wechat-wechatFriend-tips');
                         wechatFriend.tips();
                     } else {
@@ -1018,7 +1036,7 @@
                 // 微信外
                 // 弹二维码 提示用微信扫描
                 } else {
-                    if ($(e).hasClass(wechatFriend.element)) {
+                    if ($(this).hasClass(wechatFriend.element.replace('.', ''))) {
                         wechatFriend.successCallback('other-wechatFriend-tips');
                         wechatFriend.qrcode();
                     } else {
