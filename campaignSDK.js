@@ -2,7 +2,7 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-07-03 21:31:08
+* @Last Modified time: 2015-07-03 21:40:32
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -11,7 +11,7 @@
 ;
 /* jshint ignore:end */
 
-(function (window, undefined) {
+(function (window, undefined, define) {
 
     var campaignTools = {};
 
@@ -263,7 +263,7 @@
          *         1 -- Installed 已经安装
          *         2 -- Not exist 不存在
          *         3 -- Uninstalling 正在卸载
-         *         4 -- Patching 
+         *         4 -- Patching
          */
         campaignTools.getAppState = function (packageName) {
             return campaignPlugin.getAppState(packageName);
@@ -441,7 +441,7 @@
                     });
                 }
             }
-            
+
             function responseCallback (object) {
                 if (callback && typeof callback === 'function') {
                     var checkInstalled = setInterval(function () {
@@ -457,7 +457,7 @@
         };
 
         // TODO
-        // setDownloadListener(final String statusChangeCallback,  final String progressChangeCallback) 
+        // setDownloadListener(final String statusChangeCallback,  final String progressChangeCallback)
 
 
 
@@ -467,7 +467,7 @@
             P4 & 系统
         ===========================================================================
         */
-        
+
         /*
          * 刷新当前 WebView
          */
@@ -557,7 +557,7 @@
         /*
          * 获得当前 P4 IMEI
          * @return {string}
-         * @example '359250051766648' 
+         * @example '359250051766648'
          */
         campaignTools.getIMEI = function () {
             return campaignPlugin.getIMEI();
@@ -816,7 +816,7 @@
                 alert('分享成功');
             }
         }
-     * 
+     *
      */
     campaignTools.wechatWebviewShareSetup = function (shareTimelineObject, shareFriendObject) {
         $.ajax({
@@ -987,7 +987,7 @@
             }
 
             $(weibo.element).click(function () {
-                if (localVersion && parseInt(localVersion) < 528) {
+                if (localVersion && parseInt(localVersion, 10) < 528) {
                     weibo.successCallback('P4-weibo-launch');
                     campaignTools.toast('正在打开微博，请稍候...');
                     campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
@@ -1062,4 +1062,11 @@
         window.campaignTools = _campaignTools;
         return campaignTools;
     };
+
+    // 增加对 AMD 的支持
+    if (typeof define === 'function' && define.amd) {
+        define('campaignTools', [], function () {
+            return campaignTools;
+        });
+    }
 })(this);
