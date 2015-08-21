@@ -2,7 +2,7 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-08-21 14:22:22
+* @Last Modified time: 2015-08-21 14:46:44
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -983,20 +983,20 @@
         var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(weibo.shortLink || weibo.link) + '&title=' + encodeURIComponent(weibo.desc) + '&pic=' + weibo.imgUrl;
 
         if (campaignTools.UA.inWdj) {
-            var localVersion = null;
-            if (campaignTools.isInstalled('com.sina.weibo')) {
-                localVersion = campaignTools.getAppVersionName('com.sina.weibo').replace(/\./g, '');
-            }
+            // var localVersion = null;
+            // if (campaignTools.isInstalled('com.sina.weibo')) {
+            //     localVersion = campaignTools.getAppVersionName('com.sina.weibo').replace(/\./g, '');
+            // }
 
             $(weibo.element).click(function () {
-                if (localVersion && parseInt(localVersion, 10) < 528) {
+                // if (localVersion && parseInt(localVersion, 10) < 528) {
                     weibo.successCallback('P4-weibo-launch');
                     campaignTools.toast('正在打开微博，请稍候...');
                     campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
-                } else {
-                    weibo.successCallback('P4-weibo-redirect');
-                    window.location.href = weiboURL;
-                }
+                // } else {
+                //     weibo.successCallback('P4-weibo-redirect');
+                //     window.location.href = weiboURL;
+                // }
             });
 
             $(wechatFriend.element).click(function () {
