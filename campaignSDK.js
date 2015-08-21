@@ -2,7 +2,7 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-07-03 21:40:32
+* @Last Modified time: 2015-08-21 14:22:22
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -113,24 +113,26 @@
             shareUrl = shareUrl || 'http://www.wandoujia.com/';
             appType = appType || 'SINA_WEIBO';
 
-            // 此接口在微博版本 >= 5.2.8 时，会出现无法微博分享传递文案的情况
-            // 判断如果微博版本小于 5.2.8时，调用此接口，否则，跳转到微博的 http 分享页面
-            if (appType === 'SINA_WEIBO') {
-                var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(shareUrl) + '&title=' + encodeURIComponent(title) + '&pic=' + imgUrl;
-                var localVersion = null;
+            // // 此接口在微博版本 >= 5.2.8 时，会出现无法微博分享传递文案的情况
+            // // 判断如果微博版本小于 5.2.8时，调用此接口，否则，跳转到微博的 http 分享页面
+            // if (appType === 'SINA_WEIBO') {
+            //     var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(shareUrl) + '&title=' + encodeURIComponent(title) + '&pic=' + imgUrl;
+            //     var localVersion = null;
 
-                if (campaignPlugin.isInstalled('com.sina.weibo')) {
-                    localVersion = campaignPlugin.getAppVersionName('com.sina.weibo').replace(/\./g, '');
-                }
+            //     if (campaignPlugin.isInstalled('com.sina.weibo')) {
+            //         localVersion = campaignPlugin.getAppVersionName('com.sina.weibo').replace(/\./g, '');
+            //     }
 
-                if (localVersion && parseInt(localVersion) < 528) {
-                    campaignPlugin.shareTo(title, content, imgUrl, shareUrl, appType);
-                } else {
-                    window.location.href = weiboURL;
-                }
-            } else {
-                campaignPlugin.shareTo(title, content, imgUrl, shareUrl, appType);
-            }
+            //     if (localVersion && parseInt(localVersion) < 528) {
+            //         campaignPlugin.shareTo(title, content, imgUrl, shareUrl, appType);
+            //     } else {
+            //         window.location.href = weiboURL;
+            //     }
+            // } else {
+            //     campaignPlugin.shareTo(title, content, imgUrl, shareUrl, appType);
+            // }
+
+            campaignPlugin.shareTo(title, content, imgUrl, shareUrl, appType);
         };
 
         /*
