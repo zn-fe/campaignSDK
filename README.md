@@ -33,20 +33,20 @@ campaignTools.subscribe('123456', function (resp) {
 // 微信 webview 中启动微信右上角的分享给好友和朋友圈功能
 if (campaignTools.UA.inWechat) {
     var shareTimelineObject = {
-        title: '这是分享给好友的标题',
-        desc: '这是分享给好友的简介',
-        link: '这是分享给好友的链接',
-        imgUrl: 'http://www.wandoujia.com/xxx.jpg', //配图
-        successCallback: function () {
-            alert('分享给微信好友成功');
-        }
-    };
-    var shareFriendObject = {
-        title: '这是分享到朋友圈标题',
+        title: '这是分享到朋友圈的标题',
         link: '这是分享到朋友圈的链接',
         imgUrl: 'http://www.wandoujia.com/xxx.jpg', //配图
         successCallback: function () {
             alert('分享到微信朋友圈成功');
+        }
+    };
+    var shareFriendObject = {
+        title: '这是分享到好友标题',
+        link: '这是分享到好友的链接',
+        desc: '这是分享给好友的简介'
+        imgUrl: 'http://www.wandoujia.com/xxx.jpg', //配图
+        successCallback: function () {
+            alert('分享给微信好友成功');
         }
     };
 
