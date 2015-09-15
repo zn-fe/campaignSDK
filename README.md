@@ -21,7 +21,7 @@
  */
 
 // P4 中弹出提示
-if (campaignTools.UA.inWDJ) {
+if (campaignTools.UA.inWdj) {
     campaignTools.toast('success!');    
 }
 
