@@ -1,8 +1,8 @@
 /*
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
-* @Last Modified by:   Jiyun
-* @Last Modified time: 2015-08-21 14:46:44
+* @Last Modified by:   midare
+* @Last Modified time: 2015-09-23 02:02:41
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -1027,7 +1027,7 @@
                 // 微信内
                 // 提示点击右上角
                 if (campaignTools.UA.inWechat) {
-                    if ($(this).hasClass(wechatFriend.element.replace('.', ''))) {
+                    if ($(this).is(wechatFriend.element)) {
                         wechatFriend.successCallback('wechat-wechatFriend-tips');
                         wechatFriend.tips();
                     } else {
@@ -1038,7 +1038,7 @@
                 // 微信外
                 // 弹二维码 提示用微信扫描
                 } else {
-                    if ($(this).hasClass(wechatFriend.element.replace('.', ''))) {
+                    if ($(this).is(wechatFriend.element)) {
                         wechatFriend.successCallback('other-wechatFriend-tips');
                         wechatFriend.qrcode();
                     } else {
