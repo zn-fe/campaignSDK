@@ -1,8 +1,8 @@
 /*
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
-* @Last Modified by:   midare
-* @Last Modified time: 2015-09-23 02:02:41
+* @Last Modified by:   Jiyun
+* @Last Modified time: 2015-11-24 19:30:20
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -344,15 +344,15 @@
             campaignPlugin.startActivity('wdj://detail/subscribe/publisher/' + type + '/' + id);
         };
 
-        // 打开某个订阅源账号的 P4 profile 页面
-        campaignTools.openSubscribePublisher = function (uid) {
-            if (typeof campaignPlugin.openSubscribePublisher !== 'undefined') {
-                campaignPlugin.openSubscribePublisher(uid);
-            } else {
-                var url = 'intent://subscribe.wandoujia.com/publisher/ACCOUNT/' + uid + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
-                campaignPlugin.startActivity(url);
-            }
-        };
+        // // 打开某个订阅源账号的 P4 profile 页面
+        // campaignTools.openSubscribePublisher = function (uid) {
+        //     if (typeof campaignPlugin.openSubscribePublisher !== 'undefined') {
+        //         campaignPlugin.openSubscribePublisher(uid);
+        //     } else {
+        //         var url = 'intent://subscribe.wandoujia.com/publisher/ACCOUNT/' + uid + '#Intent;scheme=http;action=android.intent.action.MAIN;end';
+        //         campaignPlugin.startActivity(url);
+        //     }
+        // };
 
         // 打开某个订阅列表
         campaignTools.openSubscribeSubset = function (id) {
@@ -485,23 +485,23 @@
             campaignPlugin.setOrientation(isVertical);
         };
 
-        /*
-         * 下载文件
-         * @param url {string} 需要下载的URL
-         * @param title {string} 为文件的标题（如壁纸的名字，音乐的标题）
-         * @param type {num} type为文件类型
-         * @example:
-            type:
-            1: App
-            2: 是保留类型，请勿使用
-            3: 图片
-            4: 音乐
-            5: 视频
-            6: 漫画
-         */
-        campaignTools.download = function (url, title, type) {
-            campaignPlugin.download(url, title, type);
-        };
+        
+        //  * 下载文件
+        //  * @param url {string} 需要下载的URL
+        //  * @param title {string} 为文件的标题（如壁纸的名字，音乐的标题）
+        //  * @param type {num} type为文件类型
+        //  * @example:
+        //     type:
+        //     1: App
+        //     2: 是保留类型，请勿使用
+        //     3: 图片
+        //     4: 音乐
+        //     5: 视频
+        //     6: 漫画
+         
+        // campaignTools.download = function (url, title, type) {
+        //     campaignPlugin.download(url, title, type);
+        // };
 
         /*
          * 关闭当前 WebView
