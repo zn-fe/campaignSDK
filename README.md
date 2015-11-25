@@ -233,8 +233,8 @@ if (campaignTools.UA.inWechat) {
 * id: 订阅源账号 id
 * type: 账号类型，一般为字符串 'ACCOUNT'
 
-##### 26. campaignTools.openSubscribePublisher(uid)
-> 打开某个订阅源账号的 P4 profile 页面 (同 25)
+##### ~~26. campaignTools.openSubscribePublisher(uid)~~
+> ~~打开某个订阅源账号的 P4 profile 页面 (同 25)~~
 
 **参数说明：**
 * uid: 订阅源账号 id
@@ -293,7 +293,7 @@ if (campaignTools.UA.inWdj) {
 
 ##### 32. campaignTools.setOrientation(isVertical)
 
-##### 33. campaignTools.download(url, title, type)
+##### 33. ~~campaignTools.download(url, title, type)~~
 
 ##### 34. campaignTools.closeWebView()
 
