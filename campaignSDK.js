@@ -2,7 +2,7 @@
 * @Author: @schumilin
 * @Date:   2015-01-28 14:20:50
 * @Last Modified by:   Jiyun
-* @Last Modified time: 2015-11-24 19:30:20
+* @Last Modified time: 2016-01-05 19:05:59
 */
 
 /*global $, jQuery, ga, _gaq, wx */
@@ -988,7 +988,7 @@
             //     localVersion = campaignTools.getAppVersionName('com.sina.weibo').replace(/\./g, '');
             // }
 
-            $(weibo.element).click(function () {
+            $(document).on('click', weibo.element, function () {
                 // if (localVersion && parseInt(localVersion, 10) < 528) {
                     weibo.successCallback('P4-weibo-launch');
                     campaignTools.toast('正在打开微博，请稍候...');
@@ -999,14 +999,14 @@
                 // }
             });
 
-            $(wechatFriend.element).click(function () {
+            $(document).on('click', wechatFriend.element, function () {
                 wechatFriend.successCallback('P4-wechatFriend-launch');
 
                 campaignTools.toast('正在打开微信，请稍候...');
                 campaignTools.runAppShare(wechatFriend.title, wechatFriend.desc, wechatFriend.imgUrl, wechatFriend.link, 'WECHAT');
             });
 
-            $(wechatTimeline.element).click(function () {
+            $(document).on('click', wechatTimeline.element, function () {
                 wechatTimeline.successCallback('P4-wechatTimeline-launch');
 
                 campaignTools.toast('正在打开微信，请稍候...');
@@ -1017,13 +1017,13 @@
 
             // 分享到微博
             // 跳转页面
-            $(weibo.element).click(function () {
+            $(document).on('click', weibo.element, function () {
                 weibo.successCallback('weibo-redirect');
                 location.href = weiboURL;
             });
 
             // 分享到微信
-            $(wechatFriend.element + ', ' + wechatTimeline.element).click(function (e) {
+            $(document).on('click', wechatFriend.element + ', ' + wechatTimeline.element, function (e) {
                 // 微信内
                 // 提示点击右上角
                 if (campaignTools.UA.inWechat) {
@@ -1039,7 +1039,7 @@
                 // 弹二维码 提示用微信扫描
                 } else {
                     if ($(this).is(wechatFriend.element)) {
-                        wechatFriend.successCallback('other-wechatFriend-tips');
+                        wechatFriend.successCallback('other-wechatFriend-qrcode');
                         wechatFriend.qrcode();
                     } else {
                         wechatTimeline.successCallback('other-wechatTimeline-qrcode');
