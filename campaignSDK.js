@@ -485,7 +485,7 @@
             campaignPlugin.setOrientation(isVertical);
         };
 
-        
+
         //  * 下载文件
         //  * @param url {string} 需要下载的URL
         //  * @param title {string} 为文件的标题（如壁纸的名字，音乐的标题）
@@ -498,7 +498,7 @@
         //     4: 音乐
         //     5: 视频
         //     6: 漫画
-         
+
         // campaignTools.download = function (url, title, type) {
         //     campaignPlugin.download(url, title, type);
         // };
@@ -980,74 +980,50 @@
     */
 
     campaignTools.shareButtonSetup = function (weibo, wechatFriend, wechatTimeline) {
-        var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(weibo.shortLink || weibo.link) + '&title=' + encodeURIComponent(weibo.desc) + '&pic=' + weibo.imgUrl;
+        $(document).off('click', weibo.element);
+        $(document).off('click', wechatFriend.element);
+        $(document).off('click', wechatTimeline.element);
 
-        if (campaignTools.UA.inWdj) {
-            // var localVersion = null;
-            // if (campaignTools.isInstalled('com.sina.weibo')) {
-            //     localVersion = campaignTools.getAppVersionName('com.sina.weibo').replace(/\./g, '');
-            // }
+        $(document).on('click', weibo.element, function () {
+            if (campaignTools.UA.inWdj) {
+                weibo.successCallback('P4-weibo-launch');
+                campaignTools.toast('正在打开微博，请稍候...');
+                campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
+            } else {
+                var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(weibo.shortLink || weibo.link) + '&title=' + encodeURIComponent(weibo.desc) + '&pic=' + weibo.imgUrl;
 
-            $(document).on('click', weibo.element, function () {
-                // if (localVersion && parseInt(localVersion, 10) < 528) {
-                    weibo.successCallback('P4-weibo-launch');
-                    campaignTools.toast('正在打开微博，请稍候...');
-                    campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
-                // } else {
-                //     weibo.successCallback('P4-weibo-redirect');
-                //     window.location.href = weiboURL;
-                // }
-            });
-
-            $(document).on('click', wechatFriend.element, function () {
-                wechatFriend.successCallback('P4-wechatFriend-launch');
-
-                campaignTools.toast('正在打开微信，请稍候...');
-                campaignTools.runAppShare(wechatFriend.title, wechatFriend.desc, wechatFriend.imgUrl, wechatFriend.link, 'WECHAT');
-            });
-
-            $(document).on('click', wechatTimeline.element, function () {
-                wechatTimeline.successCallback('P4-wechatTimeline-launch');
-
-                campaignTools.toast('正在打开微信，请稍候...');
-                campaignTools.runAppShare(wechatTimeline.title, wechatTimeline.title, wechatTimeline.imgUrl, wechatTimeline.link, 'WECHAT_TIMELINE');
-            });
-
-        } else {
-
-            // 分享到微博
-            // 跳转页面
-            $(document).on('click', weibo.element, function () {
                 weibo.successCallback('weibo-redirect');
                 location.href = weiboURL;
-            });
+            }
+        });
 
-            // 分享到微信
-            $(document).on('click', wechatFriend.element + ', ' + wechatTimeline.element, function (e) {
-                // 微信内
-                // 提示点击右上角
-                if (campaignTools.UA.inWechat) {
-                    if ($(this).is(wechatFriend.element)) {
-                        wechatFriend.successCallback('wechat-wechatFriend-tips');
-                        wechatFriend.tips();
-                    } else {
-                        wechatTimeline.successCallback('wechat-wechatTimeline-tips');
-                        wechatTimeline.tips();
-                    }
+        $(document).on('click', wechatFriend.element, function () {
+            if (campaignTools.UA.inWdj) {
+                wechatFriend.successCallback('P4-wechatFriend-launch');
+                campaignTools.toast('正在打开微信，请稍候...');
+                campaignTools.runAppShare(wechatFriend.title, wechatFriend.desc, wechatFriend.imgUrl, wechatFriend.link, 'WECHAT');
+            } else if (campaignTools.UA.inWechat) {
+                wechatFriend.successCallback('wechat-wechatFriend-tips');
+                wechatFriend.tips();
+            } else {
+                wechatFriend.successCallback('other-wechatFriend-qrcode');
+                wechatFriend.qrcode();
+            }
+        });
 
-                // 微信外
-                // 弹二维码 提示用微信扫描
-                } else {
-                    if ($(this).is(wechatFriend.element)) {
-                        wechatFriend.successCallback('other-wechatFriend-qrcode');
-                        wechatFriend.qrcode();
-                    } else {
-                        wechatTimeline.successCallback('other-wechatTimeline-qrcode');
-                        wechatTimeline.qrcode();
-                    }
-                }
-            });
-        }
+        $(document).on('click', wechatTimeline.element, function () {
+            if (campaignTools.UA.inWdj) {
+                wechatTimeline.successCallback('P4-wechatTimeline-launch');
+                campaignTools.toast('正在打开微信，请稍候...');
+                campaignTools.runAppShare(wechatTimeline.title, wechatTimeline.title, wechatTimeline.imgUrl, wechatTimeline.link, 'WECHAT_TIMELINE');
+            } else if (campaignTools.UA.inWechat) {
+                wechatTimeline.successCallback('wechat-wechatTimeline-tips');
+                wechatTimeline.tips();
+            } else {
+                wechatTimeline.successCallback('other-wechatTimeline-qrcode');
+                wechatTimeline.qrcode();
+            }
+        });
     };
 
     /*
