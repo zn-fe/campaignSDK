@@ -979,56 +979,90 @@
     };
     */
 
+    var shareOptionList = {
+        weibo: [],
+        wechatFriend: [],
+        wechatTimeline: []
+    };
+
+    var getShareOptionByElement = function (elementSelector, shareOptionList) {
+        for (var i = shareOptionList.length - 1; i >= 0; i--) {
+            if (shareOptionList[i].element === elementSelector) {
+                return shareOptionList[i];
+            }
+        }
+        return false;
+    };
+
+    var setShareOption = function (option, optionType) {
+        var optionAlreadyInList = getShareOptionByElement(option.element, shareOptionList[optionType]);
+
+        if (optionAlreadyInList) {
+
+            // 如果存在当前 element 下的 option，那么覆盖配置
+            optionAlreadyInList = option;
+        } else if (option.element) {
+
+            // 如果不存在，那么 push option，绑定事件
+            shareOptionList[optionType].push(option);
+
+            // 根据不同的 optionType（weibo、wechatFriend、wechatTimeline）绑定不同的 handlr
+            // 注意 handlr 中的 option 指向的引用永远都是这个 option.element 对应的，因此以后可以覆盖配置
+            switch (optionType) {
+                case 'weibo':
+                    $(document).on('click', option.element, function () {
+                        if (campaignTools.UA.inWdj) {
+                            option.successCallback('P4-weibo-launch');
+                            campaignTools.toast('正在打开微博，请稍候...');
+                            campaignTools.runAppShare(null, option.desc, option.imgUrl, option.shortLink || option.link, 'SINA_WEIBO');
+                        } else {
+                            var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(option.shortLink || option.link) + '&title=' + encodeURIComponent(option.desc) + '&pic=' + option.imgUrl;
+
+                            option.successCallback('weibo-redirect');
+                            location.href = weiboURL;
+                        }
+                    });
+                    break;
+
+                case 'wechatFriend':
+                    $(document).on('click', option.element, function () {
+                        if (campaignTools.UA.inWdj) {
+                            option.successCallback('P4-wechatFriend-launch');
+                            campaignTools.toast('正在打开微信，请稍候...');
+                            campaignTools.runAppShare(option.title, option.desc, option.imgUrl, option.link, 'WECHAT');
+                        } else if (campaignTools.UA.inWechat) {
+                            option.successCallback('wechat-wechatFriend-tips');
+                            option.tips();
+                        } else {
+                            option.successCallback('other-wechatFriend-qrcode');
+                            option.qrcode();
+                        }
+                    });
+                    break;
+
+                case 'wechatTimeline':
+                    $(document).on('click', option.element, function () {
+                        if (campaignTools.UA.inWdj) {
+                            option.successCallback('P4-wechatTimeline-launch');
+                            campaignTools.toast('正在打开微信，请稍候...');
+                            campaignTools.runAppShare(option.title, option.title, option.imgUrl, option.link, 'WECHAT_TIMELINE');
+                        } else if (campaignTools.UA.inWechat) {
+                            option.successCallback('wechat-wechatTimeline-tips');
+                            option.tips();
+                        } else {
+                            option.successCallback('other-wechatTimeline-qrcode');
+                            option.qrcode();
+                        }
+                    });
+
+            }
+        }
+    };
+
     campaignTools.shareButtonSetup = function (weibo, wechatFriend, wechatTimeline) {
-        if (weibo.element) {
-            $(document).off('click', weibo.element);
-            $(document).on('click', weibo.element, function () {
-                if (campaignTools.UA.inWdj) {
-                    weibo.successCallback('P4-weibo-launch');
-                    campaignTools.toast('正在打开微博，请稍候...');
-                    campaignTools.runAppShare(null, weibo.desc, weibo.imgUrl, weibo.shortLink || weibo.link, 'SINA_WEIBO');
-                } else {
-                    var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(weibo.shortLink || weibo.link) + '&title=' + encodeURIComponent(weibo.desc) + '&pic=' + weibo.imgUrl;
-
-                    weibo.successCallback('weibo-redirect');
-                    location.href = weiboURL;
-                }
-            });
-        }
-
-        if (wechatFriend.element) {
-            $(document).off('click', wechatFriend.element);
-            $(document).on('click', wechatFriend.element, function () {
-                if (campaignTools.UA.inWdj) {
-                    wechatFriend.successCallback('P4-wechatFriend-launch');
-                    campaignTools.toast('正在打开微信，请稍候...');
-                    campaignTools.runAppShare(wechatFriend.title, wechatFriend.desc, wechatFriend.imgUrl, wechatFriend.link, 'WECHAT');
-                } else if (campaignTools.UA.inWechat) {
-                    wechatFriend.successCallback('wechat-wechatFriend-tips');
-                    wechatFriend.tips();
-                } else {
-                    wechatFriend.successCallback('other-wechatFriend-qrcode');
-                    wechatFriend.qrcode();
-                }
-            });
-        }
-
-        if (wechatTimeline.element) {
-            $(document).off('click', wechatTimeline.element);
-            $(document).on('click', wechatTimeline.element, function () {
-                if (campaignTools.UA.inWdj) {
-                    wechatTimeline.successCallback('P4-wechatTimeline-launch');
-                    campaignTools.toast('正在打开微信，请稍候...');
-                    campaignTools.runAppShare(wechatTimeline.title, wechatTimeline.title, wechatTimeline.imgUrl, wechatTimeline.link, 'WECHAT_TIMELINE');
-                } else if (campaignTools.UA.inWechat) {
-                    wechatTimeline.successCallback('wechat-wechatTimeline-tips');
-                    wechatTimeline.tips();
-                } else {
-                    wechatTimeline.successCallback('other-wechatTimeline-qrcode');
-                    wechatTimeline.qrcode();
-                }
-            });
-        }
+        setShareOption(weibo, 'weibo');
+        setShareOption(wechatFriend, 'wechatFriend');
+        setShareOption(wechatTimeline, 'wechatTimeline');
     };
 
     /*
