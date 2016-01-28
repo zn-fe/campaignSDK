@@ -980,11 +980,8 @@
     */
 
     campaignTools.shareButtonSetup = function (weibo, wechatFriend, wechatTimeline) {
-        $(document).off('click', weibo.element);
-        $(document).off('click', wechatFriend.element);
-        $(document).off('click', wechatTimeline.element);
-
         if (weibo.element) {
+            $(document).off('click', weibo.element);
             $(document).on('click', weibo.element, function () {
                 if (campaignTools.UA.inWdj) {
                     weibo.successCallback('P4-weibo-launch');
@@ -1000,6 +997,7 @@
         }
 
         if (wechatFriend.element) {
+            $(document).off('click', wechatFriend.element);
             $(document).on('click', wechatFriend.element, function () {
                 if (campaignTools.UA.inWdj) {
                     wechatFriend.successCallback('P4-wechatFriend-launch');
@@ -1016,6 +1014,7 @@
         }
 
         if (wechatTimeline.element) {
+            $(document).off('click', wechatTimeline.element);
             $(document).on('click', wechatTimeline.element, function () {
                 if (campaignTools.UA.inWdj) {
                     wechatTimeline.successCallback('P4-wechatTimeline-launch');
