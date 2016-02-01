@@ -987,7 +987,7 @@
 
     var getShareOptionByElement = function (elementSelector, shareOptionList) {
         for (var i = shareOptionList.length - 1; i >= 0; i--) {
-            if (shareOptionList[i].element === elementSelector) {
+            if ($(shareOptionList[i].element)[0] === $(elementSelector)[0]) {
                 return shareOptionList[i];
             }
         }
