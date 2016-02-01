@@ -1000,62 +1000,71 @@
         if (optionAlreadyInList) {
 
             // 如果存在当前 element 下的 option，那么覆盖配置
-            optionAlreadyInList = option;
-        } else if (option.element) {
-
-            // 如果不存在，那么 push option，绑定事件
-            shareOptionList[optionType].push(option);
-
-            // 根据不同的 optionType（weibo、wechatFriend、wechatTimeline）绑定不同的 handlr
-            // 注意 handlr 中的 option 指向的引用永远都是这个 option.element 对应的，因此以后可以覆盖配置
-            switch (optionType) {
-                case 'weibo':
-                    $(document).on('click', option.element, function () {
-                        if (campaignTools.UA.inWdj) {
-                            option.successCallback('P4-weibo-launch');
-                            campaignTools.toast('正在打开微博，请稍候...');
-                            campaignTools.runAppShare(null, option.desc, option.imgUrl, option.shortLink || option.link, 'SINA_WEIBO');
-                        } else {
-                            var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(option.shortLink || option.link) + '&title=' + encodeURIComponent(option.desc) + '&pic=' + option.imgUrl;
-
-                            option.successCallback('weibo-redirect');
-                            location.href = weiboURL;
-                        }
-                    });
-                    break;
-
-                case 'wechatFriend':
-                    $(document).on('click', option.element, function () {
-                        if (campaignTools.UA.inWdj) {
-                            option.successCallback('P4-wechatFriend-launch');
-                            campaignTools.toast('正在打开微信，请稍候...');
-                            campaignTools.runAppShare(option.title, option.desc, option.imgUrl, option.link, 'WECHAT');
-                        } else if (campaignTools.UA.inWechat) {
-                            option.successCallback('wechat-wechatFriend-tips');
-                            option.tips();
-                        } else {
-                            option.successCallback('other-wechatFriend-qrcode');
-                            option.qrcode();
-                        }
-                    });
-                    break;
-
-                case 'wechatTimeline':
-                    $(document).on('click', option.element, function () {
-                        if (campaignTools.UA.inWdj) {
-                            option.successCallback('P4-wechatTimeline-launch');
-                            campaignTools.toast('正在打开微信，请稍候...');
-                            campaignTools.runAppShare(option.title, option.title, option.imgUrl, option.link, 'WECHAT_TIMELINE');
-                        } else if (campaignTools.UA.inWechat) {
-                            option.successCallback('wechat-wechatTimeline-tips');
-                            option.tips();
-                        } else {
-                            option.successCallback('other-wechatTimeline-qrcode');
-                            option.qrcode();
-                        }
-                    });
-
+            for (var key in optionAlreadyInList) {
+              if (optionAlreadyInList.hasOwnProperty(key)) {
+                optionAlreadyInList[key] = option[key];
+              }
             }
+
+            return;
+        }
+
+        if (!option.element) {
+            return;
+        }
+
+        // 如果不存在，那么 push option，绑定事件
+        shareOptionList[optionType].push(option);
+
+        // 根据不同的 optionType（weibo、wechatFriend、wechatTimeline）绑定不同的 handlr
+        // 注意 handlr 中的 option 指向的引用永远都是这个 option.element 对应的，因此以后可以覆盖配置
+        switch (optionType) {
+            case 'weibo':
+                $(document).on('click', option.element, function () {
+                    if (campaignTools.UA.inWdj) {
+                        option.successCallback('P4-weibo-launch');
+                        campaignTools.toast('正在打开微博，请稍候...');
+                        campaignTools.runAppShare(null, option.desc, option.imgUrl, option.shortLink || option.link, 'SINA_WEIBO');
+                    } else {
+                        var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(option.shortLink || option.link) + '&title=' + encodeURIComponent(option.desc) + '&pic=' + option.imgUrl;
+
+                        option.successCallback('weibo-redirect');
+                        // location.href = weiboURL;
+                    }
+                });
+                break;
+
+            case 'wechatFriend':
+                $(document).on('click', option.element, function () {
+                    if (campaignTools.UA.inWdj) {
+                        option.successCallback('P4-wechatFriend-launch');
+                        campaignTools.toast('正在打开微信，请稍候...');
+                        campaignTools.runAppShare(option.title, option.desc, option.imgUrl, option.link, 'WECHAT');
+                    } else if (campaignTools.UA.inWechat) {
+                        option.successCallback('wechat-wechatFriend-tips');
+                        option.tips();
+                    } else {
+                        option.successCallback('other-wechatFriend-qrcode');
+                        option.qrcode();
+                    }
+                });
+                break;
+
+            case 'wechatTimeline':
+                $(document).on('click', option.element, function () {
+                    if (campaignTools.UA.inWdj) {
+                        option.successCallback('P4-wechatTimeline-launch');
+                        campaignTools.toast('正在打开微信，请稍候...');
+                        campaignTools.runAppShare(option.title, option.title, option.imgUrl, option.link, 'WECHAT_TIMELINE');
+                    } else if (campaignTools.UA.inWechat) {
+                        option.successCallback('wechat-wechatTimeline-tips');
+                        option.tips();
+                    } else {
+                        option.successCallback('other-wechatTimeline-qrcode');
+                        option.qrcode();
+                    }
+                });
+
         }
     };
 
