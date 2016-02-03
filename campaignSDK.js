@@ -1029,7 +1029,7 @@
                         var weiboURL = 'http://service.weibo.com/share/share.php?appkey=1483181040&relateUid=1727978503&url=' + encodeURIComponent(option.shortLink || option.link) + '&title=' + encodeURIComponent(option.desc) + '&pic=' + option.imgUrl;
 
                         option.successCallback('weibo-redirect');
-                        // location.href = weiboURL;
+                        location.href = weiboURL;
                     }
                 });
                 break;
