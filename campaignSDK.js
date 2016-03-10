@@ -822,7 +822,7 @@
      */
     campaignTools.wechatWebviewShareSetup = function (shareTimelineObject, shareFriendObject) {
         $.ajax({
-            url: 'http://who.wandoujia.com/wx-corp/js-sdk',
+            url: 'http://who.wandoujia.com/wx-corp',
             type: 'POST',
             data: {
                 url: location.href.split('#')[0]
